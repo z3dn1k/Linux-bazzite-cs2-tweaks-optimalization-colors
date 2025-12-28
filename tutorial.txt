@@ -1,0 +1,81 @@
+
+------------------------------------------- STEP 1 ---------------------------------------------------------------------------
+
+-Step 1: Install the Shader Files (The "Manual" Way)
+  -This command creates the necessary folders, downloads the helper file that actually exists, and manually writes the "Vibrance" code that we know works.
+
+-Copy and paste this entire block into the terminal:
+
+# 1. Create the folders
+mkdir -p ~/.local/share/vkBasalt/shaders/Shaders
+mkdir -p ~/.local/share/vkBasalt/shaders/Textures
+
+# 2. Download the Helper file (ReShade.fxh) - This link works
+wget https://raw.githubusercontent.com/crosire/reshade-shaders/master/Shaders/ReShade.fxh -O ~/.local/share/vkBasalt/shaders/Shaders/ReShade.fxh
+
+# 3. Manually create the Vibrance.fx file with 100% intensity
+cat <<EOF > ~/.local/share/vkBasalt/shaders/Shaders/Vibrance.fx
+#include "ReShade.fxh"
+
+uniform float VibranceIntensity <
+    ui_type = "drag";
+    ui_min = -1.0; ui_max = 1.0;
+> = 1.00; // <--- 1.00 IS MAXIMUM VIBRANCE
+
+float3 VibrancePass(float4 vpos : SV_Position, float2 texcoord : TexCoord) : SV_Target
+{
+    float3 color = tex2D(ReShade::BackBuffer, texcoord).rgb;
+    float3 coefLuma = float3(0.2126, 0.7152, 0.0722);
+    float luma = dot(coefLuma, color);
+    float max_color = max(color.r, max(color.g, color.b));
+    float min_color = min(color.r, min(color.g, color.b));
+    float color_saturation = max_color - min_color;
+    color = lerp(luma, color, (1.0 + (VibranceIntensity * (1.0 - (sign(VibranceIntensity) * color_saturation)))));
+    return color;
+}
+
+technique Vibrance
+{
+    pass
+    {
+        VertexShader = PostProcessVS;
+        PixelShader = VibrancePass;
+    }
+}
+EOF
+
+------------------------------------------- STEP 2 ---------------------------------------------------------------------------
+
+-Step 2: Create the Config File
+  -This tells vkBasalt to use the file we just created. I added the HOME key as a toggle so you can turn it on/off while playing to compare.
+
+-Copy and paste this block:
+
+cat <<EOF > ~/.config/vkBasalt/vkBasalt.conf
+reshadeIncludePath = $HOME/.local/share/vkBasalt/shaders/Shaders
+reshadeTexturePath = $HOME/.local/share/vkBasalt/shaders/Textures
+
+effects = Vibrance
+Vibrance = $HOME/.local/share/vkBasalt/shaders/Shaders/Vibrance.fx
+
+toggleKey = Home
+EOF
+
+------------------------------------------- STEP 3 ---------------------------------------------------------------------------
+
+-Step 3: The CS2 Launch Options
+  -This is your optimized command. It includes the stretch resolution, your 320Hz refresh rate, and the command to enable the colors.
+
+-Paste this into Steam > CS2 > Properties > Launch Options:
+
+gamescope -w 1080 -h 1080 -W 1920 -H 1080 -r 320 -S stretch -f --force-grab-cursor -- env ENABLE_VKBASALT=1 %command% -high -novid -fullscreen
+
+------------------------------------------- SUMMARY ---------------------------------------------------------------------------
+
+-Summary of Controls:
+
+  -To play: Just launch the game.
+
+  -To check colors: Press the Home key on your keyboard to toggle the effect On/Off.
+
+  -To change intensity: Edit the Vibrance.fx file and change 1.00 to something else (e.g., 1.50 for extreme colors).
