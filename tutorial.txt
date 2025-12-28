@@ -1,26 +1,38 @@
+==============================================================================
+CS2 VIBRANCE & STRETCHED RES SETUP GUIDE (LINUX)
+==============================================================================
 
-------------------------------------------- STEP 1 ---------------------------------------------------------------------------
+This guide helps you manually install a "Vibrance" shader for vkBasalt and 
+configure Gamescope for a stretched resolution in Counter-Strike 2.
 
--Step 1: Install the Shader Files (The "Manual" Way)
-  -This command creates the necessary folders, downloads the helper file that actually exists, and manually writes the "Vibrance" code that we know works.
+PREREQUISITES:
+- vkbasalt (Installed via your package manager)
+- gamescope (Installed via your package manager)
 
--Copy and paste this entire block into the terminal:
+------------------------------------------------------------------------------
+STEP 1: INSTALL THE SHADER FILES
+------------------------------------------------------------------------------
+This step creates the necessary folders, downloads the required "ReShade.fxh" 
+helper file, and creates the "Vibrance.fx" shader file.
 
-# 1. Create the folders
-mkdir -p ~/.local/share/vkBasalt/shaders/Shaders
-mkdir -p ~/.local/share/vkBasalt/shaders/Textures
+INSTRUCTIONS:
+Copy and paste the entire block of code below into your terminal:
 
-# 2. Download the Helper file (ReShade.fxh) - This link works
-wget https://raw.githubusercontent.com/crosire/reshade-shaders/master/Shaders/ReShade.fxh -O ~/.local/share/vkBasalt/shaders/Shaders/ReShade.fxh
+# 1. Create the necessary folders
+mkdir -p "$HOME/.local/share/vkBasalt/shaders/Shaders"
+mkdir -p "$HOME/.local/share/vkBasalt/shaders/Textures"
 
-# 3. Manually create the Vibrance.fx file with 100% intensity
-cat <<EOF > ~/.local/share/vkBasalt/shaders/Shaders/Vibrance.fx
+# 2. Download the Helper file (ReShade.fxh)
+wget https://raw.githubusercontent.com/crosire/reshade-shaders/master/Shaders/ReShade.fxh -O "$HOME/.local/share/vkBasalt/shaders/Shaders/ReShade.fxh"
+
+# 3. Create the Vibrance.fx file (Default: 1.00 Intensity)
+cat <<EOF > "$HOME/.local/share/vkBasalt/shaders/Shaders/Vibrance.fx"
 #include "ReShade.fxh"
 
 uniform float VibranceIntensity <
     ui_type = "drag";
     ui_min = -1.0; ui_max = 1.0;
-> = 1.00; // <--- 1.00 IS MAXIMUM VIBRANCE
+> = 1.00; // <--- EDIT THIS VALUE TO CHANGE INTENSITY (e.g. 0.50 or 1.00)
 
 float3 VibrancePass(float4 vpos : SV_Position, float2 texcoord : TexCoord) : SV_Target
 {
@@ -44,14 +56,20 @@ technique Vibrance
 }
 EOF
 
-------------------------------------------- STEP 2 ---------------------------------------------------------------------------
+------------------------------------------------------------------------------
+STEP 2: CREATE THE CONFIG FILE
+------------------------------------------------------------------------------
+This step links vkBasalt to the shader we just created and assigns the 
+"Home" key as a toggle switch.
 
--Step 2: Create the Config File
-  -This tells vkBasalt to use the file we just created. I added the HOME key as a toggle so you can turn it on/off while playing to compare.
+INSTRUCTIONS:
+Copy and paste the entire block below into your terminal:
 
--Copy and paste this block:
+# 1. Ensure the config directory exists
+mkdir -p "$HOME/.config/vkBasalt"
 
-cat <<EOF > ~/.config/vkBasalt/vkBasalt.conf
+# 2. Write the configuration file
+cat <<EOF > "$HOME/.config/vkBasalt/vkBasalt.conf"
 reshadeIncludePath = $HOME/.local/share/vkBasalt/shaders/Shaders
 reshadeTexturePath = $HOME/.local/share/vkBasalt/shaders/Textures
 
@@ -61,21 +79,25 @@ Vibrance = $HOME/.local/share/vkBasalt/shaders/Shaders/Vibrance.fx
 toggleKey = Home
 EOF
 
-------------------------------------------- STEP 3 ---------------------------------------------------------------------------
+------------------------------------------------------------------------------
+STEP 3: CS2 LAUNCH OPTIONS
+------------------------------------------------------------------------------
+This sets up Gamescope for stretched resolution and enables vkBasalt.
 
--Step 3: The CS2 Launch Options
-  -This is your optimized command. It includes the stretch resolution, your 320Hz refresh rate, and the command to enable the colors.
-
--Paste this into Steam > CS2 > Properties > Launch Options:
+INSTRUCTIONS:
+Go to Steam Library > Right-click CS2 > Properties > Launch Options.
+Paste the line below:
 
 gamescope -w 1080 -h 1080 -W 1920 -H 1080 -r 320 -S stretch -f --force-grab-cursor -- env ENABLE_VKBASALT=1 %command% -high -novid -fullscreen
 
-------------------------------------------- SUMMARY ---------------------------------------------------------------------------
+IMPORTANT HARDWARE NOTES:
+- "-r 320": This is the Refresh Rate. Change "320" to 144, 165, or 240 if needed.
+- "-w 1080 -h 1080": This is the stretched resolution (1080x1080).
+- "-W 1920 -H 1080": This is your native monitor resolution.
 
--Summary of Controls:
-
-  -To play: Just launch the game.
-
-  -To check colors: Press the Home key on your keyboard to toggle the effect On/Off.
-
-  -To change intensity: Edit the Vibrance.fx file and change 1.00 to something else (e.g., 1.50 for extreme colors).
+------------------------------------------------------------------------------
+SUMMARY
+------------------------------------------------------------------------------
+- To Toggle Colors: Press the "Home" key on your keyboard while in-game.
+- To Change Intensity: Edit the "Vibrance.fx" file located in:
+  ~/.local/share/vkBasalt/shaders/Shaders/
