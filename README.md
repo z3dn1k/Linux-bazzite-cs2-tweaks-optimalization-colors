@@ -1,6 +1,15 @@
-# Linux-bazzite-cs2-increased-vibrance
-Some terminal magic and launch option bafoonery to make cs2 more vibrant on bazzite linux.
+# Linux Bazzite CS2 Increased Vibrance
 
-gamescope -w 1080 -h 1080 -W 1920 -H 1080 -r 320 -S stretch -f --force-grab-cursor -- env ENABLE_VKBASALT=1 %command% -high -novid -fullscreen -----------------------------------------------------------------> Btw there are some launch options that might not work for everybody for example: -r 320 (basicaly sets refresh rate to 320hz so you have to have a 320hz monitor if you dont just set is to whatever or jus tremove it). And i personaly play on 1080 by 1080 resolution so i had to make it so that launch options create and launch with the resoluition so either change this section: gamescope -w 1080 -h 1080 or remove it. Also some launch options increase fps or optimize cs so i would recomend customizing the launch options for your self.
+Some terminal magic and launch option buffoonery to make CS2 more vibrant on Bazzite Linux.
 
-note: might or might not brick your os
+## Launch Options
+Add this to your CS2 Launch Options in Steam:
+
+```Launch options
+gamescope -w 1080 -h 1080 -W 1920 -H 1080 -r 320 -S stretch -f --force-grab-cursor -- env ENABLE_VKBASALT=1 %command% -high -novid -fullscreen
+```
+
+### Warning and potentional problems
+1. -r 320 --> makes refresh rate 320hz so you need a monitor with 320hz to use this but of course you can change it to your own refresh rate 60hz, 144hz, 240hz or whatever you have
+2. gamescope -w 1080 -h 1080 --> makes a custom resolution and starts with it for me i use 1080x1080 (dont judge pls) you can either change it or remove it
+3. all the launch options --> honestly the most important thing is to follow the tutorial and read this so you change whats needed
